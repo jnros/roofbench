@@ -2,9 +2,11 @@
 
 Roofline: GPU specs + model params predict where inference flips from memory to compute-bound. 
 
-Framework: RTX 2060 ridge ~18.8 FLOP/byte
+Framework: RTX 2060 ridge point ~18.8 FLOP/byte. Nonspecific workloads below 18.8 are memory bound.  Above are compute bound.
 
-Qwen2.5-3B Q4 single-sequence decode runs at 3.3 FLOP/byte. Implied ridge batch = 18.8 / 3.3 ≈ 5.8.
+Qwen2.5-3B Q4 single-sequence decode runs at 3.3 FLOP/byte. Implied ridge batch = 18.8 / 3.3 ≈ 5.8. 
+
+Does latency per token flatten out after batch size of 5?  Yes.  Empirically verified.
 
 Memory-bound regime (batch ≤ 5): adding sequences releases the GPU math hounds. Same weight load, more output. Compute-bound regime (batch ≥ 6): more sequences don't help. Per-token latency goes flat. We can only do so much math.
 
@@ -40,20 +42,4 @@ nvcc -O3 -arch=sm_75 -o sweep sweep.cu
 ./sweep
 ```
 
-## Run LLM benchmarks
 
-Requires [ollama](https://ollama.com) with `qwen2.5:3b-instruct` loaded.
-
-```bash
-# enable parallel batching
-sudo systemctl edit ollama   # add: Environment="OLLAMA_NUM_PARALLEL=8"
-sudo systemctl restart ollama
-
-uv run python3 decode_bench.py
-uv run python3 batch_bench.py
-```
-
-## Key result
-
-For qwen2.5:3b Q4\_K\_M (1.9 GB, 3.1B params), intensity per sequence = 3.3 FLOP/byte.
-Ridge batch size = 18.8 / 3.3 ≈ **5.8** — measured transition at batch 5→6 confirms this.
