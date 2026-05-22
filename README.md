@@ -1,7 +1,16 @@
-# GPU Roofline — RTX 2060 Mobile
+# GPU Roofline and Inference Latency
 
-Microbenchmarks and LLM inference analysis using the roofline model.
-Hardware: NVIDIA GeForce RTX 2060 Mobile (sm_75, 30 SMs, 6 GB GDDR6).
+Roofline: GPU specs + model params predict where inference flips from memory to compute-bound. 
+
+Framework: RTX 2060 ridge ~18.8 FLOP/byte
+
+Qwen2.5-3B Q4 single-sequence decode runs at 3.3 FLOP/byte. Implied ridge batch = 18.8 / 3.3 ≈ 5.8.
+
+Memory-bound regime (batch ≤ 5): adding sequences releases the GPU math hounds. Same weight load, more output. Compute-bound regime (batch ≥ 6): more sequences don't help. Per-token latency goes flat. We can only do so much math.
+
+Benchmarks and LLM inference analysis using the roofline model.
+
+Hardware: NVIDIA GeForce RTX 2060 (sm_75, 30 SMs, 6 GB GDDR6).
 
 ![Roofline](roofline.png) ![Batch throughput](latency.png)
 
