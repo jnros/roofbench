@@ -3,7 +3,7 @@
 Microbenchmarks and LLM inference analysis using the roofline model.
 Hardware: NVIDIA GeForce RTX 2060 Mobile (sm_75, 30 SMs, 6 GB GDDR6).
 
-![Roofline](roofline.png) ![Batch throughput](batch.png)
+![Roofline](roofline.png) ![Batch throughput](latency.png)
 
 ## Measured hardware
 
